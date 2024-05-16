@@ -1,17 +1,55 @@
-import { Schema } from 'mongoose'
-import { Student } from './student.interface'
+import { Schema, model } from 'mongoose'
+import { Guardian, LocalGuardian, Name, Student } from './student.interface'
 
-export const studentSchema = new Schema<Student>({
-  id: { type: String },
-  name: {
-    firstName: {
-      type: String,
-      required: true,
-    },
-    lastName: {
-      type: String,
-    },
+const nameSchema = new Schema<Name>({
+  firstName: {
+    type: String,
+    required: true,
   },
+  lastName: {
+    type: String,
+  },
+})
+
+const guardianSchema = new Schema<Guardian>({
+  fatherName: {
+    type: String,
+    required: true,
+  },
+  fatherOccupation: {
+    type: String,
+  },
+  fatherContactNo: {
+    type: String,
+  },
+  motherName: {
+    type: String,
+    required: true,
+  },
+  motherOccupation: {
+    type: String,
+  },
+})
+
+const localGuardianSchema = new Schema<LocalGuardian>({
+  name: {
+    type: String,
+    required: true,
+  },
+  occupation: {
+    type: String,
+  },
+  contactNo: {
+    type: String,
+  },
+  address: {
+    type: String,
+  },
+})
+
+const studentSchema = new Schema<Student>({
+  id: { type: String, unique: true },
+  name: nameSchema,
   isActive: ['active', 'inactive'],
   gender: ['male', 'female'],
   dateOfBirth: {
@@ -38,41 +76,13 @@ export const studentSchema = new Schema<Student>({
   permanentAddress: {
     type: String,
   },
-  guardian: {
-    fatherName: {
-      type: String,
-      required: true,
-    },
-    fatherOccupation: {
-      type: String,
-    },
-    fatherContactNo: {
-      type: String,
-    },
-    motherName: {
-      type: String,
-      required: true,
-    },
-    motherOccupation: {
-      type: String,
-    },
-  },
-  localGuardian: {
-    name: {
-      type: String,
-      required: true,
-    },
-    occupation: {
-      type: String,
-    },
-    contactNo: {
-      type: String,
-    },
-    address: {
-      type: String,
-    },
-  },
+  guardian: guardianSchema,
+  localGuardian: localGuardianSchema,
   profileImage: {
     type: String,
   },
 })
+
+const StudentModel = model<Student>('Student', studentSchema)
+
+export default StudentModel
