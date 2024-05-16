@@ -15,6 +15,35 @@ const createTeacher = async (req: Request, res: Response) => {
   }
 }
 
-export const TeacherController = {
+const getTeachers = async (req: Request, res: Response) => {
+  try {
+    const teachers = await TeacherServices.getTeachers()
+    res.status(200).json({
+      success: true,
+      message: 'Teachers get successfully',
+      data: teachers,
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const getTeacher = async (req: Request, res: Response) => {
+  try {
+    const { _id } = req.params
+    const teacher = await TeacherServices.getTeacher(_id)
+    res.status(200).json({
+      success: true,
+      message: 'Teacher get successfully',
+      data: teacher,
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const TeacherControllers = {
   createTeacher,
+  getTeachers,
+  getTeacher,
 }

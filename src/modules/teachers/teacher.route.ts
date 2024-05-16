@@ -1,10 +1,12 @@
 import express from 'express'
-import { TeacherController } from './teacher.controller'
+import { TeacherControllers } from './teacher.controller'
 
 const router = express.Router()
 
-const { createTeacher } = TeacherController
+const { createTeacher, getTeachers, getTeacher } = TeacherControllers
 
+router.get('/', getTeachers)
+router.get('/:_id', getTeacher)
 router.post('/create-teacher', createTeacher)
 
 export const TeacherRoutes = router
