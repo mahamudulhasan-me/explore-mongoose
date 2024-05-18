@@ -1,10 +1,18 @@
 import { Schema, model } from 'mongoose'
+import validator from 'validator'
 import { Guardian, LocalGuardian, Name, Student } from './student.interface'
 
 const nameSchema = new Schema<Name>({
   firstName: {
     type: String,
-    required: true,
+    required: [true, 'First name is required'],
+    validate: {
+      validator: function (value: string) {
+        const ideaNameFormat = value.charAt(0).toUpperCase() + value.slice(1)
+        return ideaNameFormat === value
+      },
+      message: '{VALUE} is not capitalize format',
+    },
   },
   lastName: {
     type: String,
@@ -14,7 +22,7 @@ const nameSchema = new Schema<Name>({
 const guardianSchema = new Schema<Guardian>({
   fatherName: {
     type: String,
-    required: true,
+    required: [true, 'Father name is required'],
   },
   fatherOccupation: {
     type: String,
@@ -24,7 +32,7 @@ const guardianSchema = new Schema<Guardian>({
   },
   motherName: {
     type: String,
-    required: true,
+    required: [true, 'Mother name is required'],
   },
   motherOccupation: {
     type: String,
@@ -34,7 +42,7 @@ const guardianSchema = new Schema<Guardian>({
 const localGuardianSchema = new Schema<LocalGuardian>({
   name: {
     type: String,
-    required: true,
+    required: [true, 'Local guardian name is required'],
   },
   occupation: {
     type: String,
@@ -49,35 +57,66 @@ const localGuardianSchema = new Schema<LocalGuardian>({
 
 const studentSchema = new Schema<Student>({
   id: { type: String, unique: true },
-  name: nameSchema,
-  isActive: ['active', 'inactive'],
-  gender: ['male', 'female'],
+  name: {
+    type: nameSchema,
+    trim: true,
+    required: [true, 'Name is required'],
+    maxlength: [50, 'Name should not be more than 50 characters'],
+  },
+  isActive: {
+    type: String,
+    enum: ['active', 'inactive'],
+    default: 'active',
+  },
+  gender: {
+    type: String,
+    enum: {
+      values: ['male', 'female'],
+      message: '{VALUE} is not valid gender',
+    },
+    required: [true, 'Gender is required'],
+  },
   dateOfBirth: {
     type: String,
-    required: true,
+    required: [true, 'Date of birth is required'],
   },
   email: {
     type: String,
-    required: true,
+    required: [true, 'Email is required'],
+    unique: true,
+    validate: {
+      validator: (value: string) => validator.isEmail(value),
+      message: '{VALUE} is not email',
+    },
   },
   contactNumberNo: {
     type: String,
-    required: true,
+    required: [true, 'Contact number is required'],
+    unique: true,
   },
   emergencyContactNo: {
     type: String,
-    required: true,
+    required: [true, 'Contact number is required'],
   },
-  bloodGroup: ['A+', 'A-', 'O+', 'AB+', 'B+', 'B-', 'AB-', 'O-'],
+  bloodGroup: {
+    type: String,
+    enum: ['A+', 'A-', 'O+', 'AB+', 'B+', 'B-', 'AB-', 'O-'],
+  },
   presentAddress: {
     type: String,
-    required: true,
+    required: [true, 'Present address is required'],
   },
   permanentAddress: {
     type: String,
   },
-  guardian: guardianSchema,
-  localGuardian: localGuardianSchema,
+  guardian: {
+    type: guardianSchema,
+    required: [true, 'Guardian is required'],
+  },
+  localGuardian: {
+    type: localGuardianSchema,
+    required: [true, 'Local guardian is required'],
+  },
   profileImage: {
     type: String,
   },

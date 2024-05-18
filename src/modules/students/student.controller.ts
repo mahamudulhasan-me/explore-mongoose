@@ -1,9 +1,20 @@
 import { Request, Response } from 'express'
 import { StudentServices } from './student.service'
+import JoiStudentSchema from './student.validation'
 
 const createStudent = async (req: Request, res: Response) => {
   try {
+    // Define Joi schema for Student
+
     const student = req.body.student
+    const { error } = JoiStudentSchema.validate(student)
+    if (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Something went wrong!',
+        error,
+      })
+    }
     const result = await StudentServices.createStudentIntoDB(student)
     res.status(200).json({
       success: true,
@@ -11,7 +22,11 @@ const createStudent = async (req: Request, res: Response) => {
       data: result,
     })
   } catch (error) {
-    console.log(error)
+    res.status(500).json({
+      success: false,
+      message: 'Something went wrong!',
+      error,
+    })
   }
 }
 
@@ -39,7 +54,11 @@ const getStudent = async (req: Request, res: Response) => {
       data: student,
     })
   } catch (error) {
-    console.log(error)
+    res.status(500).json({
+      success: false,
+      message: 'Something went wrong!',
+      error,
+    })
   }
 }
 
