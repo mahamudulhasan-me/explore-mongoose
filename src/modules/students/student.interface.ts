@@ -19,6 +19,7 @@ export interface LocalGuardian {
 export interface Student {
   id: string
   name: Name
+  password: string
   isActive: 'active' | 'inactive'
   gender: 'male' | 'female'
   dateOfBirth: string
@@ -31,4 +32,5 @@ export interface Student {
   guardian: Guardian
   localGuardian: LocalGuardian
   profileImage?: string | undefined
+  isDeleted: boolean
 }

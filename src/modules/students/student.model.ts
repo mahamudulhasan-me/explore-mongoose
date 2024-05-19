@@ -1,5 +1,7 @@
+import bcrypt from 'bcrypt'
 import { Schema, model } from 'mongoose'
 import validator from 'validator'
+import config from '../../config'
 import { Guardian, LocalGuardian, Name, Student } from './student.interface'
 
 const nameSchema = new Schema<Name>({
@@ -63,6 +65,10 @@ const studentSchema = new Schema<Student>({
     required: [true, 'Name is required'],
     maxlength: [50, 'Name should not be more than 50 characters'],
   },
+  password: {
+    type: String,
+    required: true,
+  },
   isActive: {
     type: String,
     enum: ['active', 'inactive'],
@@ -120,6 +126,34 @@ const studentSchema = new Schema<Student>({
   profileImage: {
     type: String,
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+studentSchema.pre('save', async function (next) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const user = this
+  this.password = await bcrypt.hash(
+    user.password,
+    Number(config.BCRYPT_SALT_ROUND),
+  )
+  next()
+})
+
+studentSchema.post('save', (doc, next) => {
+  doc.password = ''
+  next()
+})
+
+studentSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } })
+  next()
+})
+
+studentSchema.pre('find', function () {
+  console.log(this)
 })
 
 const StudentModel = model<Student>('Student', studentSchema)
